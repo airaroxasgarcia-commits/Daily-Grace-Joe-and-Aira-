@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Daily Grace — For Joe &amp; Aira</title>
+
+<!-- PWA: installable to home screen, works offline -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7B4FE0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Daily Grace">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png" type="image/png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- non-blocking font load: trimmed to only the weights actually used -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;600;700&display=swap"></noscript>
+<style>
+  :root{
+    --pink:#F0568C;
+    --pink-soft:#FF8FB3;
+    --violet:#7B4FE0;
+    --violet-deep:#4A2E86;
+    --green:#20A87E;
+    --green-soft:#6FD3AE;
+    --cream:#FBF5FA;
+    --ink:#332145;
+    --ink-soft:#7a6b8e;
+    --card:#FFFFFF;
+    --ring: rgba(123,79,224,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:'Work Sans', sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 15% 0%, #FBE0EE 0%, transparent 45%),
+      radial-gradient(circle at 85% 10%, #E3D9FA 0%, transparent 40%),
+      radial-gradient(circle at 50% 90%, #D7F3E7 0%, transparent 45%),
+      linear-gradient(180deg, #FDF6FA 0%, #F7F1FB 40%, #F2FAF6 100%);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  a{color:inherit;}
+
+  /* ---------- floating sparkles (decorative, reduced-motion aware) ---------- */
+  .sparkle-field{
+    position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;
+  }
+  .sparkle{
+    position:absolute; width:6px; height:6px; border-radius:50%;
+    background:var(--violet); opacity:0.35;
+    animation:float 14s ease-in-out infinite;
+  }
+  @keyframes float{
+    0%,100%{ transform:translateY(0) translateX(0); opacity:0.15;}
+    50%{ transform:translateY(-40px) translateX(10px); opacity:0.5;}
+  }
+
+  /* ---------- header ---------- */
+  header{
+    position:relative; z-index:1;
+    max-width:900px; margin:0 auto; padding:48px 24px 12px;
+    text-align:center;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:13px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--green); font-weight:600; margin-bottom:14px;
+    background:rgba(32,168,126,0.1); padding:6px 16px; border-radius:999px;
+  }
+  .eyebrow svg{width:14px;height:14px;}
+  .names-greeting{
+    font-family:'Fraunces', serif; font-style:italic; font-weight:500;
+    font-size:1.05rem; color:var(--pink); margin:0 0 6px;
+  }
+  h1.site-title{
+    font-family:'Fraunces', serif; font-weight:600; font-style:normal;
+    font-size:clamp(2.4rem, 6vw, 3.6rem);
+    margin:0 0 6px;
+    background:linear-gradient(100deg, var(--pink), var(--violet) 55%, var(--green));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    letter-spacing:-0.01em;
+  }
+  .tagline{
+    color:var(--ink-soft); font-size:16px; margin:0 auto; max-width:480px; line-height:1.5;
+  }
+  .today-date{
+    margin-top:18px; font-size:14px; color:var(--violet-deep); font-weight:600;
+    letter-spacing:0.02em;
+  }
+
+  /* ---------- theme ribbon ---------- */
+  .theme-ribbon{
+    position:relative; z-index:1;
+    max-width:760px; margin:28px auto 0; padding:0 24px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+  }
+  .theme-btn{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    background:var(--card); border:2px solid transparent; border-radius:18px;
+    padding:14px 8px; cursor:pointer; font-family:'Work Sans',sans-serif;
+    font-size:12.5px; font-weight:600; color:var(--ink-soft);
+    box-shadow:0 3px 12px rgba(74,46,134,0.08);
+    transition:transform .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease;
+  }
+  .theme-btn svg{width:22px;height:22px;}
+  .theme-btn:hover{ transform:translateY(-3px); box-shadow:0 8px 18px rgba(74,46,134,0.14); }
+  .theme-btn:focus-visible{ outline:3px solid var(--ring); outline-offset:2px; }
+  .theme-btn.active{
+    border-color:currentColor;
+    box-shadow:0 8px 20px rgba(74,46,134,0.16);
+  }
+  .theme-btn[data-theme="Gratitude"]{ color:var(--pink); }
+  .theme-btn[data-theme="Blessing"]{ color:var(--violet); }
+  .theme-btn[data-theme="Abundance"]{ color:var(--green); }
+  .theme-btn[data-theme="Health"]{ color:var(--violet-deep); }
+
+  /* ---------- hero verse card ---------- */
+  .hero{
+    position:relative; z-index:1;
+    max-width:760px; margin:36px auto; padding:0 24px;
+  }
+  .sunburst{
+    position:absolute; top:50%; left:50%;
+    width:640px; height:640px;
+    transform:translate(-50%,-50%);
+    z-index:-1; opacity:0.5;
+    animation:spin 120s linear infinite;
+    will-change:transform;
+  }
+  @keyframes spin{ to{ transform:translate(-50%,-50%) rotate(360deg);} }
+
+  .verse-card{
+    position:relative;
+    background:var(--card);
+    border-radius:28px;
+    padding:44px 36px;
+    box-shadow:0 14px 34px rgba(74,46,134,0.16), 0 2px 8px rgba(74,46,134,0.06);
+    text-align:center;
+    overflow:hidden;
+  }
+  .verse-card::before{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(135deg, rgba(240,86,140,0.08), rgba(123,79,224,0.06) 40%, rgba(32,168,126,0.07));
+    pointer-events:none;
+  }
+  .verse-tag{
+    display:inline-block; font-size:12px; font-weight:700; letter-spacing:0.08em;
+    text-transform:uppercase; padding:6px 14px; border-radius:999px;
+    color:#fff; margin-bottom:22px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  }
+  blockquote{
+    margin:0; font-family:'Fraunces', serif; font-style:italic; font-weight:500;
+    font-size:clamp(1.35rem, 3.4vw, 1.9rem); line-height:1.45; color:var(--violet-deep);
+  }
+  .verse-ref{
+    margin-top:20px; font-family:'Work Sans', sans-serif; font-weight:700; font-size:15px;
+    color:var(--ink-soft); letter-spacing:0.02em;
+  }
+  .verse-ref::before{ content:"— "; }
+
+  .verse-dedication{
+    margin-top:14px; font-size:13px; color:var(--pink); font-weight:600;
+  }
+
+  .verse-actions{
+    display:flex; justify-content:center; gap:12px; margin-top:28px; flex-wrap:wrap;
+  }
+  .btn{
+    font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px;
+    border:none; cursor:pointer; padding:12px 22px; border-radius:999px;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn:focus-visible{ outline:3px solid var(--ring); outline-offset:2px; }
+  .btn-primary{
+    background:linear-gradient(100deg, var(--pink), var(--violet));
+    color:#fff; box-shadow:0 8px 20px rgba(240,86,140,0.35);
+  }
+  .btn-ghost{
+    background:rgba(123,79,224,0.08); color:var(--violet-deep);
+  }
+  .btn svg{width:16px;height:16px;}
+
+  /* ---------- content sections ---------- */
+  .section{
+    position:relative; z-index:1;
+    max-width:760px; margin:0 auto 28px; padding:0 24px;
+  }
+  .panel{
+    background:var(--card); border-radius:24px; padding:34px 32px;
+    box-shadow:0 8px 22px rgba(74,46,134,0.08);
+    position:relative;
+  }
+  .panel-head{
+    display:flex; align-items:center; gap:12px; margin-bottom:16px;
+  }
+  .panel-icon{
+    width:40px; height:40px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .panel-icon svg{width:20px; height:20px; color:#fff;}
+  .panel-head h2{
+    font-family:'Fraunces', serif; font-weight:600; font-size:1.3rem; margin:0; color:var(--violet-deep);
+  }
+  .panel-body{ line-height:1.75; font-size:15.5px; color:var(--ink); }
+  .panel-body p{ margin:0 0 12px; }
+  .panel-body p:last-child{ margin-bottom:0; }
+
+  #prayer-panel .panel-icon{ background:linear-gradient(135deg, var(--violet), var(--pink-soft)); }
+  #story-panel .panel-icon{ background:linear-gradient(135deg, var(--green), var(--green-soft)); }
+
+  .story-title{
+    font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:1.05rem;
+    color:var(--pink); margin:0 0 10px;
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    position:relative; z-index:1;
+    text-align:center; padding:36px 24px 56px; color:var(--ink-soft); font-size:13px;
+  }
+  footer .leaf{ width:26px; height:26px; margin:0 auto 10px; display:block; color:var(--green); opacity:0.7; }
+  footer .dedication{
+    margin-top:10px; font-family:'Fraunces', serif; font-style:italic; color:var(--violet);
+    font-size:13.5px;
+  }
+
+  @media (max-width:560px){
+    .theme-ribbon{ grid-template-columns:repeat(2,1fr); }
+    .verse-card{ padding:32px 22px; }
+    .panel{ padding:26px 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .sunburst{ animation:none; }
+    .sparkle{ animation:none; }
+    html{ scroll-behavior:auto; }
+  }
+
+  /* ---------- install banner (mini-app prompt) ---------- */
+  body{ padding-bottom: env(safe-area-inset-bottom); }
+  .install-banner{
+    position:fixed; left:16px; right:16px; bottom:16px; z-index:20;
+    background:linear-gradient(100deg, var(--pink), var(--violet));
+    color:#fff; border-radius:18px; padding:14px 16px;
+    display:flex; align-items:center; gap:12px;
+    box-shadow:0 14px 34px rgba(74,46,134,0.35);
+    transform:translateY(140%); transition:transform .35s ease;
+    max-width:420px; margin:0 auto;
+  }
+  .install-banner.show{ transform:translateY(0); }
+  .install-banner svg{ width:26px; height:26px; flex-shrink:0; }
+  .install-banner .copy{ flex:1; font-size:13px; line-height:1.35; }
+  .install-banner .copy strong{ display:block; font-size:14px; margin-bottom:2px; }
+  .install-banner button{
+    font-family:'Work Sans',sans-serif; font-weight:700; font-size:13px;
+    background:#fff; color:var(--violet-deep); border:none; border-radius:999px;
+    padding:9px 16px; cursor:pointer; flex-shrink:0;
+  }
+  .install-banner .dismiss{
+    background:transparent; color:#fff; font-weight:600; padding:9px 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="sparkle-field" id="sparkleField" aria-hidden="true"></div>
+
+<header>
+  <span class="eyebrow">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/><circle cx="12" cy="12" r="4"/></svg>
+    Daily Grace
+  </span>
+  <p class="names-greeting" id="namesGreeting"></p>
+  <h1 class="site-title">Today's Word of Grace</h1>
+  <p class="tagline">A verse, a prayer, and a story of faith — for gratitude, blessing, abundance, and health, made just for the two of you.</p>
+  <p class="today-date" id="todayDate"></p>
+</header>
+
+<nav class="theme-ribbon" id="themeRibbon" aria-label="Filter by theme">
+  <button class="theme-btn" data-theme="Gratitude">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 3 5 6.5 5c2 0 3.5 1.5 5.5 4 2-2.5 3.5-4 5.5-4C21 5 23.5 8.5 21.5 12.5 19 16.65 12 21 12 21z"/></svg>
+    Gratitude
+  </button>
+  <button class="theme-btn" data-theme="Blessing">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3M12 3l-3 3M12 3l3 3M5 21c0-4 3-6 7-6s7 2 7 6"/><circle cx="12" cy="12" r="3"/></svg>
+    Blessing
+  </button>
+  <button class="theme-btn" data-theme="Abundance">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c3 3 5 6.5 5 10a5 5 0 0 1-10 0c0-3.5 2-7 5-10z"/><path d="M8 21h8"/></svg>
+    Abundance
+  </button>
+  <button class="theme-btn" data-theme="Health">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+    Health
+  </button>
+</nav>
+
+<main>
+  <section class="hero">
+    <svg class="sunburst" viewBox="0 0 200 200" aria-hidden="true">
+      <g fill="none" stroke="#7B4FE0" stroke-width="1.2" opacity="0.4">
+        <g id="rays"></g>
+      </g>
+      <circle cx="100" cy="100" r="46" fill="none" stroke="#F0568C" stroke-width="1" opacity="0.35"/>
+    </svg>
+
+    <div class="verse-card">
+      <span class="verse-tag" id="verseTag" style="background:var(--pink);">Gratitude</span>
+      <blockquote id="verseText">Loading today's verse…</blockquote>
+      <p class="verse-ref" id="verseRef"></p>
+      <p class="verse-dedication">For Joe &amp; Aira 💗</p>
+
+      <div class="verse-actions">
+        <button class="btn btn-primary" id="newVerseBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+          New Verse
+        </button>
+        <button class="btn btn-ghost" id="shareBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+          Copy to Share
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="panel" id="prayer-panel">
+      <div class="panel-head">
+        <span class="panel-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21c-3-3-8-6-8-11a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5-5 8-8 11-.7.7-1.3.7-2 0z"/></svg>
+        </span>
+        <h2>A Prayer for Joe &amp; Aira</h2>
+      </div>
+      <div class="panel-body" id="prayerText"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="panel" id="story-panel">
+      <div class="panel-head">
+        <span class="panel-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </span>
+        <h2>A Story of Faith</h2>
+      </div>
+      <div class="panel-body">
+        <p class="story-title" id="storyTitle"></p>
+        <div id="storyText"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <svg class="leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22c8-2 10-9 10-16C14 6 6 8 6 16c0 2 1 4 3 5"/><path d="M6 21c3-4 8-9 16-14"/></svg>
+  "In every thing give thanks." — 1 Thessalonians 5:18
+  <p class="dedication">Made with love, for Joe &amp; Aira's daily walk of faith.</p>
+</footer>
+
+<div class="install-banner" id="installBanner">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+  <div class="copy">
+    <strong id="installCopyTitle">Add to Home Screen</strong>
+    <span id="installCopyBody">Keep Daily Grace one tap away, every morning.</span>
+  </div>
+  <button id="installBtn">Add</button>
+  <button class="dismiss" id="installDismiss" aria-label="Dismiss">✕</button>
+</div>
+
+<script>
+const THEME_COLORS = {
+  Gratitude: 'var(--pink)',
+  Blessing: 'var(--violet)',
+  Abundance: 'var(--green)',
+  Health: 'var(--violet-deep)'
+};
+
+const VERSES = [
+  {
+    theme: "Gratitude",
+    ref: "1 Thessalonians 5:18",
+    verse: "In every thing give thanks: for this is the will of God in Christ Jesus concerning you.",
+    prayer: "Father, thank You for Joe and Aira, and for this new day You've given them. Even when life feels heavy, teach their hearts to find a reason to give thanks. Let gratitude be their first response, not their last resort. In Jesus' name, Amen.",
+    storyTitle: "The Jar of Small Things",
+    story: "A woman named Elena kept a glass jar on her kitchen windowsill. Each evening, no matter how hard the day had been, she dropped in a small folded paper — one thing she was thankful for. Some nights it was just 'warm coffee' or 'a friend's phone call.' On the anniversary of her husband's passing, she almost skipped it. Then she remembered his voice, teaching her to do this years before, and wrote 'his laugh, which I can still hear.' By year's end, the jar was full. She realized gratitude hadn't erased her grief — it had simply made room for joy to live beside it."
+  },
+  {
+    theme: "Blessing",
+    ref: "Numbers 6:24-26",
+    verse: "The LORD bless thee, and keep thee: The LORD make his face shine upon thee, and be gracious unto thee: The LORD lift up his countenance upon thee, and give thee peace.",
+    prayer: "Lord, let Your face shine upon Joe and Aira today — in their home, their work, and every person they meet. Keep them in Your peace, and make their life together a blessing to everyone around them. Amen.",
+    storyTitle: "The Blessing Passed Along",
+    story: "A pastor in a small village used to end every visit with the same words: 'The Lord bless you and keep you.' A young boy in the congregation, Mateo, memorized it without knowing why. Years later, as a soldier far from home, he found himself sitting beside a frightened stranger the night before a difficult journey. Without thinking, he spoke the old blessing over him. The stranger wept — it was the same blessing his own grandmother used to pray. Mateo realized a blessing spoken in one small room can travel farther than we ever imagine, carried in the hearts of those who receive it."
+  },
+  {
+    theme: "Abundance",
+    ref: "John 10:10",
+    verse: "I am come that they might have life, and that they might have it more abundantly.",
+    prayer: "Jesus, thank You for coming to give Joe and Aira life — not just to survive, but to truly live. Open their eyes to the abundance already around them, and teach them to trust You with what they do not yet have. Amen.",
+    storyTitle: "The Widow's Garden",
+    story: "After losing her job, Ruth had almost nothing left but a small patch of dirt behind her apartment. She planted vegetables anyway, more out of habit than hope. That summer the garden overflowed — more tomatoes and beans than she could eat alone. She started leaving baskets on neighbors' porches. Soon, neighbors began sharing back: bread, eggs, an afternoon of babysitting. What began as a lonely act of survival became a small, abundant economy of kindness. Ruth often said the harvest taught her that abundance was never about having enough for herself — it was about having enough to give away."
+  },
+  {
+    theme: "Health",
+    ref: "3 John 1:2",
+    verse: "Beloved, I wish above all things that thou mayest prosper and be in health, even as thy soul prospereth.",
+    prayer: "Lord, restore what is weary in Joe and Aira's bodies and spirits. Where they are anxious, bring peace. Where they are tired, bring strength. Let their souls prosper first, and let that peace flow into every part of their lives. Amen.",
+    storyTitle: "The Long Walk Back",
+    story: "After months in a hospital bed, David could barely walk to his own mailbox. His physical therapist gave him one goal a day — first the porch step, then the driveway, then the corner. He hated how slow it felt. One evening, exhausted at the halfway point of his walk, he sat on a bench and prayed the only words he had left: 'Heal me, Lord.' A neighbor sat beside him, not to talk, just to keep him company on the walk home. Months later, David walked the whole block on his own. He said healing came the same way faith does — one small, faithful step at a time."
+  },
+  {
+    theme: "Gratitude",
+    ref: "Psalm 107:1",
+    verse: "O give thanks unto the LORD, for he is good: for his mercy endureth for ever.",
+    prayer: "Good Father, Your mercy has never run dry in Joe and Aira's lives, even on their hardest days. Thank You for being constant when they are not. Let their life together be a quiet, daily thank-you to You. Amen.",
+    storyTitle: "The Fisherman's Prayer",
+    story: "Old Tomas fished the same river every morning, rain or shine, good catch or none. Younger fishermen teased him for thanking God even on empty-net days. 'What's there to thank Him for today?' one asked. Tomas smiled and said, 'The river was still here. My hands still worked. The sun still rose.' Years later, when illness kept him from the water, the same young man came to sit with him, bringing fish from his own catch. 'I finally understand,' he said. 'Some days the thanks isn't for the catch. It's for being alive to try again tomorrow.'"
+  },
+  {
+    theme: "Blessing",
+    ref: "Psalm 103:2",
+    verse: "Bless the LORD, O my soul, and forget not all his benefits.",
+    prayer: "Lord, help Joe and Aira remember. Help them not forget the ways You have carried them, provided for them, and stayed near them. Today, may their souls choose to bless You back. Amen.",
+    storyTitle: "The Memory Stones",
+    story: "A grandmother named Ines kept a small bowl of smooth river stones on her table, each one marking a prayer God had answered — a healing, a provision, a safe journey. Her grandchildren loved picking them up and asking for the story behind each one. When Ines grew forgetful in her old age, her granddaughter began reading the stories back to her from a notebook. Ines would smile every time, as if hearing them fresh. 'I may forget the stones,' she said once, 'but I never forget that He has been good to me.' The bowl still sits on that table today, heavier every year."
+  },
+  {
+    theme: "Abundance",
+    ref: "Philippians 4:19",
+    verse: "But my God shall supply all your need according to his riches in glory by Christ Jesus.",
+    prayer: "Father, You know exactly what Joe and Aira need before they ask. Where they feel lack today, remind them of Your riches. Teach them to trust Your timing and Your provision, together. Amen.",
+    storyTitle: "Enough for the Month",
+    story: "When their income was cut in half, Marcus and his wife sat down and did the math twice, hoping for a different answer. It never quite added up. They prayed anyway and kept going. An unexpected refund arrived the same week the car needed repairs. A friend 'randomly' dropped off groceries the day their fridge was nearly empty. None of it was dramatic — no lottery win, no windfall. Just enough, again and again, exactly when needed. Looking back at that year, Marcus said it taught him the difference between abundance and excess: abundance is simply never being forgotten."
+  },
+  {
+    theme: "Health",
+    ref: "Jeremiah 17:14",
+    verse: "Heal me, O LORD, and I shall be healed; save me, and I shall be saved: for thou art my praise.",
+    prayer: "Lord, You are our praise even before the healing comes. Touch what is broken in Joe and Aira — body, mind, and heart — and give them patience for the journey toward wholeness. Amen.",
+    storyTitle: "The Waiting Room",
+    story: "Priya spent more hours in waiting rooms that year than anywhere else, waiting on test results that kept coming back uncertain. She started praying the same verse every time her name was called: 'Heal me, Lord, and I shall be healed.' Not because she felt brave, but because it was the only prayer short enough to hold onto. The healing, when it finally came, was slower and quieter than she expected — no dramatic moment, just a doctor saying 'this looks better' one ordinary Tuesday. Priya still keeps that verse taped inside her medicine cabinet, a small reminder of a waiting room prayer that was heard."
+  }
+];
+
+let currentTheme = null;
+let usedIndices = new Set();
+
+function dayOfYear(){
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now - start;
+  return Math.floor(diff / 86400000);
+}
+
+function pickIndex(theme){
+  let pool = VERSES.map((v,i)=>i).filter(i => !theme || VERSES[i].theme === theme);
+  let available = pool.filter(i => !usedIndices.has(i));
+  if(available.length === 0){
+    usedIndices.clear();
+    available = pool;
+  }
+  const idx = available[Math.floor(Math.random() * available.length)];
+  usedIndices.add(idx);
+  return idx;
+}
+
+function render(index){
+  const v = VERSES[index];
+  const tag = document.getElementById('verseTag');
+  tag.textContent = v.theme;
+  tag.style.background = THEME_COLORS[v.theme];
+  document.getElementById('verseText').textContent = '“' + v.verse + '”';
+  document.getElementById('verseRef').textContent = v.ref;
+  document.getElementById('prayerText').innerHTML = '<p>' + v.prayer + '</p>';
+  document.getElementById('storyTitle').textContent = v.storyTitle;
+  document.getElementById('storyText').innerHTML = '<p>' + v.story + '</p>';
+
+  document.querySelectorAll('.theme-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.theme === v.theme);
+  });
+}
+
+function showNewVerse(theme){
+  const idx = pickIndex(theme);
+  render(idx);
+}
+
+// initial: today's verse based on day-of-year, so it feels like "today's" pick
+function initToday(){
+  const idx = dayOfYear() % VERSES.length;
+  usedIndices.add(idx);
+  render(idx);
+}
+
+function setGreeting(){
+  const hour = new Date().getHours();
+  let greeting = "Good evening";
+  if(hour < 12) greeting = "Good morning";
+  else if(hour < 18) greeting = "Good afternoon";
+  document.getElementById('namesGreeting').textContent = greeting + ", Joe & Aira";
+}
+
+document.getElementById('newVerseBtn').addEventListener('click', ()=> showNewVerse(currentTheme));
+
+document.querySelectorAll('.theme-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const theme = btn.dataset.theme;
+    currentTheme = (currentTheme === theme) ? null : theme;
+    if(currentTheme){
+      showNewVerse(currentTheme);
+    } else {
+      document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('active'));
+    }
+  });
+});
+
+document.getElementById('shareBtn').addEventListener('click', ()=>{
+  const text = document.getElementById('verseText').textContent + ' — ' + document.getElementById('verseRef').textContent;
+  navigator.clipboard?.writeText(text).then(()=>{
+    const btn = document.getElementById('shareBtn');
+    const original = btn.innerHTML;
+    btn.innerHTML = 'Copied!';
+    setTimeout(()=>{ btn.innerHTML = original; }, 1600);
+  }).catch(()=>{});
+});
+
+document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+setGreeting();
+
+// sunburst rays
+(function buildRays(){
+  const raysGroup = document.getElementById('rays');
+  const rayCount = 24;
+  for(let i=0;i<rayCount;i++){
+    const angle = (i / rayCount) * 2 * Math.PI;
+    const x1 = 100 + Math.cos(angle) * 50;
+    const y1 = 100 + Math.sin(angle) * 50;
+    const x2 = 100 + Math.cos(angle) * 96;
+    const y2 = 100 + Math.sin(angle) * 96;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    raysGroup.appendChild(line);
+  }
+})();
+
+// sparkle field
+(function buildSparkles(){
+  const field = document.getElementById('sparkleField');
+  const colors = ['#F0568C', '#7B4FE0', '#20A87E'];
+  for(let i=0;i<10;i++){
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.style.left = Math.random()*100 + 'vw';
+    s.style.top = Math.random()*100 + 'vh';
+    s.style.background = colors[i % colors.length];
+    s.style.animationDelay = (Math.random()*10) + 's';
+    s.style.animationDuration = (10 + Math.random()*10) + 's';
+    field.appendChild(s);
+  }
+})();
+
+initToday();
+
+// ---------- PWA: service worker + install prompt ----------
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+
+const installBanner = document.getElementById('installBanner');
+const installBtn = document.getElementById('installBtn');
+const installDismiss = document.getElementById('installDismiss');
+let deferredPrompt = null;
+
+function isStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function isIOS(){
+  return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+}
+let installDismissed = false;
+function bannerDismissedRecently(){
+  return installDismissed;
+}
+
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  if(!isStandalone() && !bannerDismissedRecently()){
+    installBanner.classList.add('show');
+  }
+});
+
+installBtn.addEventListener('click', async ()=>{
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBanner.classList.remove('show');
+  } else if(isIOS()){
+    document.getElementById('installCopyTitle').textContent = 'Add to Home Screen';
+    document.getElementById('installCopyBody').textContent = 'Tap the Share icon, then "Add to Home Screen".';
+    installBtn.style.display = 'none';
+  }
+});
+
+installDismiss.addEventListener('click', ()=>{
+  installBanner.classList.remove('show');
+  installDismissed = true;
+});
+
+// iOS has no beforeinstallprompt — show the hint banner manually after a short delay
+if(isIOS() && !isStandalone() && !bannerDismissedRecently()){
+  setTimeout(()=>{
+    document.getElementById('installCopyTitle').textContent = 'Add to Home Screen';
+    document.getElementById('installCopyBody').textContent = 'Tap the Share icon, then "Add to Home Screen".';
+    installBtn.style.display = 'none';
+    installBanner.classList.add('show');
+  }, 1800);
+}
+</script>
+</body>
+</html>
