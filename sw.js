@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daily-grace-v2';
+const CACHE_NAME = 'daily-grace-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -33,33 +33,17 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first for the page itself, so a fresh upload is never stuck
-  // behind an old cached copy. Falls back to cache only when offline.
-  if (event.request.mode === 'navigate' || url.pathname.endsWith('index.html')) {
-    event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-          return response;
-        })
-        .catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
+  // Network-first for everything in this app (page, manifest, icons).
+  // This guarantees that whatever you last uploaded to GitHub is what
+  // shows up, instead of a stale cached copy sticking around.
+  // The cache is only used as a fallback when there's no connection.
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      return (
-        cached ||
-        fetch(event.request)
-          .then((response) => {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-            return response;
-          })
-          .catch(() => cached)
-      );
-    })
+    fetch(event.request)
+      .then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
