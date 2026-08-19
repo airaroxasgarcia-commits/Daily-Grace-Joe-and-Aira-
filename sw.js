@@ -24,6 +24,15 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // Only manage caching for this app's own files.
+  // Cross-origin requests (like Google Fonts) go straight to the network,
+  // letting the browser's normal font cache handle them instead.
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cached) => {
       return (
