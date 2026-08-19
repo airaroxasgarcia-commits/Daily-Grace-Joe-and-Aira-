@@ -53,20 +53,6 @@
 
   a{color:inherit;}
 
-  /* ---------- floating sparkles (decorative, reduced-motion aware) ---------- */
-  .sparkle-field{
-    position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;
-  }
-  .sparkle{
-    position:absolute; width:6px; height:6px; border-radius:50%;
-    background:var(--violet); opacity:0.35;
-    animation:float 14s ease-in-out infinite;
-  }
-  @keyframes float{
-    0%,100%{ transform:translateY(0) translateX(0); opacity:0.15;}
-    50%{ transform:translateY(-40px) translateX(10px); opacity:0.5;}
-  }
-
   /* ---------- header ---------- */
   header{
     position:relative; z-index:1;
@@ -133,13 +119,11 @@
   }
   .sunburst{
     position:absolute; top:50%; left:50%;
-    width:640px; height:640px;
+    width:520px; height:520px;
     transform:translate(-50%,-50%);
-    z-index:-1; opacity:0.5;
-    animation:spin 120s linear infinite;
-    will-change:transform;
+    z-index:-1; opacity:0.45;
+    /* static now — no continuous animation, much lighter on mobile */
   }
-  @keyframes spin{ to{ transform:translate(-50%,-50%) rotate(360deg);} }
 
   .verse-card{
     position:relative;
@@ -280,7 +264,6 @@
 </head>
 <body>
 
-<div class="sparkle-field" id="sparkleField" aria-hidden="true"></div>
 
 <header>
   <span class="eyebrow">
@@ -544,7 +527,7 @@ document.getElementById('shareBtn').addEventListener('click', ()=>{
 document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 setGreeting();
 
-// sunburst rays
+// sunburst rays (static decorative element — no animation)
 (function buildRays(){
   const raysGroup = document.getElementById('rays');
   const rayCount = 24;
@@ -558,22 +541,6 @@ setGreeting();
     line.setAttribute('x1', x1); line.setAttribute('y1', y1);
     line.setAttribute('x2', x2); line.setAttribute('y2', y2);
     raysGroup.appendChild(line);
-  }
-})();
-
-// sparkle field
-(function buildSparkles(){
-  const field = document.getElementById('sparkleField');
-  const colors = ['#F0568C', '#7B4FE0', '#20A87E'];
-  for(let i=0;i<10;i++){
-    const s = document.createElement('div');
-    s.className = 'sparkle';
-    s.style.left = Math.random()*100 + 'vw';
-    s.style.top = Math.random()*100 + 'vh';
-    s.style.background = colors[i % colors.length];
-    s.style.animationDelay = (Math.random()*10) + 's';
-    s.style.animationDuration = (10 + Math.random()*10) + 's';
-    field.appendChild(s);
   }
 })();
 

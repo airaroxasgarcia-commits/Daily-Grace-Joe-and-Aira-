@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daily-grace-v1';
+const CACHE_NAME = 'daily-grace-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -30,6 +30,21 @@ self.addEventListener('fetch', (event) => {
   // Cross-origin requests (like Google Fonts) go straight to the network,
   // letting the browser's normal font cache handle them instead.
   if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  // Network-first for the page itself, so a fresh upload is never stuck
+  // behind an old cached copy. Falls back to cache only when offline.
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('index.html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
     return;
   }
 
