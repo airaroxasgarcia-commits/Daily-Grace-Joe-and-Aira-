@@ -610,6 +610,20 @@ const NOVENA_DAYS = [
 
 const NOVENA_CLOSING = "Conclude with an Our Father, a Hail Mary, and a Glory Be.";
 
+// The novena runs continuously, never capping or resetting back to "Day 1" —
+// Day 1 is anchored to Aug 20, 2026, so it keeps counting upward from there,
+// cycling through the 9 prayer intentions as it goes (Round 2, Round 3, ...).
+const NOVENA_START = new Date(2026, 7, 20);
+
+function epochDayFor(date){
+  return Math.floor(date.getTime() / 86400000);
+}
+
+function novenaDayNumber(){
+  const diff = epochDayFor(new Date()) - epochDayFor(NOVENA_START);
+  return diff + 1;
+}
+
 // ---------- Virtual Rosary: interactive bead-by-bead prayer guide ----------
 const ROSARY_PRAYER_TEXT = {
   signOfCross: "In the name of the Father, and of the Son, and of the Holy Spirit. Amen.",
@@ -1168,9 +1182,12 @@ function renderRosary(){
 }
 
 function renderNovena(){
-  const cycleDay = (dayOfYear() % 9); // 0-8
+  const dayNum = novenaDayNumber();
+  const cycleDay = ((dayNum - 1) % 9 + 9) % 9; // 0-8, wraps forever
+  const round = Math.floor((dayNum - 1) / 9) + 1;
   const entry = NOVENA_DAYS[cycleDay];
-  document.getElementById('novenaDayBadge').textContent = 'Day ' + (cycleDay + 1) + ' of 9';
+  document.getElementById('novenaDayBadge').textContent =
+    round > 1 ? ('Day ' + dayNum + ' — Novena Round ' + round) : ('Day ' + dayNum);
   document.getElementById('novenaOpening').textContent = NOVENA_OPENING;
   document.getElementById('novenaText').innerHTML =
     '<p class="story-title" style="font-size:1rem;">' + entry.title + '</p>' +
