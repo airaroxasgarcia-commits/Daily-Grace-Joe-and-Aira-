@@ -208,6 +208,53 @@
 
   #prayer-panel .panel-icon{ background:linear-gradient(135deg, var(--violet), var(--pink-soft)); }
   #story-panel .panel-icon{ background:linear-gradient(135deg, var(--green), var(--green-soft)); }
+  #rosary-panel .panel-icon{ background:linear-gradient(135deg, var(--pink), var(--violet)); }
+  #novena-panel .panel-icon{ background:linear-gradient(135deg, var(--green), var(--violet)); }
+
+  .mystery-tag{
+    display:inline-block; font-size:12px; font-weight:700; letter-spacing:0.04em;
+    padding:5px 12px; border-radius:999px; color:#fff;
+    background:linear-gradient(100deg, var(--pink), var(--violet));
+    margin-bottom:16px;
+  }
+  .mystery-list{ list-style:none; margin:0; padding:0; }
+  .mystery-list li{
+    display:flex; gap:12px; padding:10px 0; border-top:1px solid rgba(123,79,224,0.1);
+  }
+  .mystery-list li:first-child{ border-top:none; }
+  .mystery-num{
+    flex-shrink:0; width:26px; height:26px; border-radius:50%;
+    background:rgba(123,79,224,0.1); color:var(--violet);
+    font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+  .mystery-name{ font-weight:600; color:var(--violet-deep); font-size:14.5px; }
+  .mystery-meditation{ font-size:13.5px; color:var(--ink-soft); margin-top:2px; }
+
+  .toggle-prayers{
+    margin-top:18px; width:100%; text-align:center;
+    background:rgba(123,79,224,0.08); color:var(--violet-deep);
+    border:none; border-radius:14px; padding:12px; font-weight:600; font-size:13.5px;
+    cursor:pointer; font-family:'Work Sans',sans-serif;
+  }
+  .rosary-prayers{ display:none; margin-top:16px; }
+  .rosary-prayers.show{ display:block; }
+  .prayer-block{ margin-bottom:16px; }
+  .prayer-block:last-child{ margin-bottom:0; }
+  .prayer-block h3{
+    font-family:'Work Sans',sans-serif; font-size:12.5px; text-transform:uppercase;
+    letter-spacing:0.06em; color:var(--pink); margin:0 0 6px; font-weight:700;
+  }
+  .prayer-block p{ font-size:14px; line-height:1.65; margin:0; color:var(--ink); }
+
+  .novena-day-badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700;
+    padding:5px 12px; border-radius:999px; color:#fff;
+    background:linear-gradient(100deg, var(--green), var(--violet)); margin-bottom:16px;
+  }
+  .novena-title{
+    font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:1.05rem;
+    color:var(--violet-deep); margin:0 0 10px;
+  }
 
   .story-title{
     font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:1.05rem;
@@ -349,6 +396,69 @@
       </div>
     </div>
   </section>
+
+  <section class="section">
+    <div class="panel" id="rosary-panel">
+      <div class="panel-head">
+        <span class="panel-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="7" r="1.6"/><circle cx="19" cy="7" r="1.6"/><circle cx="5" cy="17" r="1.6"/><circle cx="19" cy="17" r="1.6"/><path d="M6.3 8.2 10 11M18 8.2 14 11M6.3 15.8 10 13M18 15.8 14 13"/><path d="M12 15v6M10.3 19.5 12 21l1.7-1.5"/></svg>
+        </span>
+        <h2>Today's Rosary</h2>
+      </div>
+      <div class="panel-body">
+        <span class="mystery-tag" id="mysteryTag"></span>
+        <ol class="mystery-list" id="mysteryList"></ol>
+        <button class="toggle-prayers" id="togglePrayers">Show the Rosary Prayers</button>
+        <div class="rosary-prayers" id="rosaryPrayers">
+          <div class="prayer-block">
+            <h3>Sign of the Cross</h3>
+            <p>In the name of the Father, and of the Son, and of the Holy Spirit. Amen.</p>
+          </div>
+          <div class="prayer-block">
+            <h3>Apostles' Creed</h3>
+            <p>I believe in God, the Father Almighty, Creator of heaven and earth; and in Jesus Christ, His only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried. He descended into hell; on the third day He rose again from the dead. He ascended into heaven, and sits at the right hand of God the Father Almighty. From there He will come to judge the living and the dead. I believe in the Holy Spirit, the Holy Catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen.</p>
+          </div>
+          <div class="prayer-block">
+            <h3>Our Father</h3>
+            <p>Our Father, who art in heaven, hallowed be Thy name. Thy kingdom come, Thy will be done, on earth as it is in heaven. Give us this day our daily bread, and forgive us our trespasses, as we forgive those who trespass against us. And lead us not into temptation, but deliver us from evil. Amen.</p>
+          </div>
+          <div class="prayer-block">
+            <h3>Hail Mary <span style="font-weight:400;color:var(--ink-soft);">(pray 3 times to open)</span></h3>
+            <p>Hail Mary, full of grace, the Lord is with thee. Blessed art thou among women, and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.</p>
+          </div>
+          <div class="prayer-block">
+            <h3>Glory Be</h3>
+            <p>Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end. Amen.</p>
+          </div>
+          <div class="prayer-block">
+            <h3>For Each Decade</h3>
+            <p>Announce the mystery, pray one Our Father, ten Hail Marys, and one Glory Be. Repeat for all five mysteries above.</p>
+          </div>
+          <div class="prayer-block">
+            <h3>Hail, Holy Queen <span style="font-weight:400;color:var(--ink-soft);">(closing)</span></h3>
+            <p>Hail, Holy Queen, Mother of mercy, our life, our sweetness, and our hope. To thee do we cry, poor banished children of Eve. To thee do we send up our sighs, mourning and weeping in this valley of tears. Turn then, most gracious advocate, thine eyes of mercy toward us, and after this our exile, show unto us the blessed fruit of thy womb, Jesus. O clement, O loving, O sweet Virgin Mary. Amen.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="panel" id="novena-panel">
+      <div class="panel-head">
+        <span class="panel-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c1.5 3 1.5 5-.5 6.5C13.5 10 14 12 12 14c2 0 2.5 2.5 1 4-1 1-3 1-4 0-1.5-1.5-1-4 1-4-2-2-1.5-4 .5-5.5C8.5 7 8.5 5 10 2"/><path d="M6 20h12M8 20v-2a4 4 0 0 1 8 0v2"/></svg>
+        </span>
+        <h2>Daily Novena</h2>
+      </div>
+      <div class="panel-body">
+        <span class="novena-day-badge" id="novenaDayBadge"></span>
+        <p class="novena-title">For Joe &amp; Aira's Gratitude, Blessing, Abundance &amp; Health</p>
+        <p id="novenaOpening" style="font-style:italic; color:var(--ink-soft); font-size:14px;"></p>
+        <div id="novenaText"></div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
@@ -374,6 +484,58 @@ const THEME_COLORS = {
   Abundance: 'var(--green)',
   Health: 'var(--violet-deep)'
 };
+
+// ---------- Rosary: mysteries assigned by day of week (traditional order) ----------
+const MYSTERIES = {
+  Joyful: [
+    { name: "The Annunciation", meditation: "Mary says yes to God's plan." },
+    { name: "The Visitation", meditation: "Mary visits Elizabeth in loving service." },
+    { name: "The Nativity", meditation: "Jesus is born in Bethlehem." },
+    { name: "The Presentation", meditation: "Jesus is presented in the Temple." },
+    { name: "The Finding in the Temple", meditation: "Jesus is found teaching among the elders." }
+  ],
+  Sorrowful: [
+    { name: "The Agony in the Garden", meditation: "Jesus prays in Gethsemane." },
+    { name: "The Scourging at the Pillar", meditation: "Jesus is scourged for our sake." },
+    { name: "The Crowning with Thorns", meditation: "Jesus is mocked and crowned with thorns." },
+    { name: "The Carrying of the Cross", meditation: "Jesus carries His cross to Calvary." },
+    { name: "The Crucifixion", meditation: "Jesus gives His life for our salvation." }
+  ],
+  Glorious: [
+    { name: "The Resurrection", meditation: "Jesus rises from the dead." },
+    { name: "The Ascension", meditation: "Jesus ascends into heaven." },
+    { name: "The Descent of the Holy Spirit", meditation: "The Holy Spirit comes at Pentecost." },
+    { name: "The Assumption", meditation: "Mary is taken body and soul into heaven." },
+    { name: "The Coronation of Mary", meditation: "Mary is crowned Queen of Heaven and Earth." }
+  ],
+  Luminous: [
+    { name: "The Baptism in the Jordan", meditation: "Jesus is baptized by John." },
+    { name: "The Wedding at Cana", meditation: "Jesus turns water into wine." },
+    { name: "The Proclamation of the Kingdom", meditation: "Jesus calls all people to conversion." },
+    { name: "The Transfiguration", meditation: "Jesus is transfigured in glory before His disciples." },
+    { name: "The Institution of the Eucharist", meditation: "Jesus gives us His Body and Blood." }
+  ]
+};
+
+// Sun=Glorious, Mon=Joyful, Tue=Sorrowful, Wed=Glorious, Thu=Luminous, Fri=Sorrowful, Sat=Joyful
+const MYSTERY_BY_WEEKDAY = ["Glorious", "Joyful", "Sorrowful", "Glorious", "Luminous", "Sorrowful", "Joyful"];
+
+// ---------- Daily Novena: a 9-day cycle for gratitude, blessing, abundance & health ----------
+const NOVENA_OPENING = "Loving God, we come before You in prayer and hope, trusting in Your goodness and mercy. Hear us as we pray this novena together, Joe and Aira, believing in Your promises of gratitude, blessing, abundance, and health.";
+
+const NOVENA_DAYS = [
+  { title: "Day 1 — A Prayer of Thanksgiving", text: "Lord, today we simply say thank You — for our life together, for breath in our lungs, and for every quiet mercy we so easily overlook. Teach us to notice Your goodness in the small, ordinary moments of this day." },
+  { title: "Day 2 — A Prayer of Trust", text: "Father, where we are uncertain, give us trust. Help Joe and Aira lean on You instead of on fear, believing that You go before us and are already preparing the way." },
+  { title: "Day 3 — A Prayer for Peace", text: "Prince of Peace, calm the anxious places in our hearts. Let Your peace guard our home, our conversations, and our thoughts, even in the middle of a hard or uncertain season." },
+  { title: "Day 4 — A Prayer for Health", text: "Divine Healer, we lift up our bodies and minds to You. Strengthen what is weary, heal what is hurting, and give us the patience to care well for the health You've entrusted to us." },
+  { title: "Day 5 — A Prayer for Provision", text: "Provider God, You have never failed to supply what is needed. Where we feel lack today, remind us of Your abundance, and teach us to trust Your timing over our own." },
+  { title: "Day 6 — A Prayer for Forgiveness", text: "Merciful Father, soften our hearts toward forgiveness — of others, and of ourselves. Let grace, not grudges, shape how Joe and Aira love one another." },
+  { title: "Day 7 — A Prayer for Loved Ones", text: "Lord, we bring our families and friends before You. Watch over the people we love, bless their needs, and let our home be a place of welcome and peace for them." },
+  { title: "Day 8 — A Prayer for Purpose", text: "God of all good work, guide Joe and Aira in their calling and daily labor. Let our work, however small it feels some days, become an offering back to You." },
+  { title: "Day 9 — A Prayer of Consecration", text: "Father, as this novena closes, we offer You the week ahead — our plans, our worries, our hopes. Renew in us a spirit of gratitude, blessing, abundance, and health, today and every day." }
+];
+
+const NOVENA_CLOSING = "Conclude with an Our Father, a Hail Mary, and a Glory Be.";
 
 const VERSES = [
   {
@@ -492,6 +654,37 @@ function initToday(){
   render(idx);
 }
 
+function renderRosary(){
+  const weekday = new Date().getDay(); // 0=Sun ... 6=Sat
+  const mysteryName = MYSTERY_BY_WEEKDAY[weekday];
+  const set = MYSTERIES[mysteryName];
+  const weekdayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+
+  document.getElementById('mysteryTag').textContent = weekdayName + ' — The ' + mysteryName + ' Mysteries';
+
+  const list = document.getElementById('mysteryList');
+  list.innerHTML = set.map((m, i) =>
+    '<li><span class="mystery-num">' + (i+1) + '</span><div><div class="mystery-name">' + m.name + '</div><div class="mystery-meditation">' + m.meditation + '</div></div></li>'
+  ).join('');
+}
+
+function renderNovena(){
+  const cycleDay = (dayOfYear() % 9); // 0-8
+  const entry = NOVENA_DAYS[cycleDay];
+  document.getElementById('novenaDayBadge').textContent = 'Day ' + (cycleDay + 1) + ' of 9';
+  document.getElementById('novenaOpening').textContent = NOVENA_OPENING;
+  document.getElementById('novenaText').innerHTML =
+    '<p class="story-title" style="font-size:1rem;">' + entry.title + '</p>' +
+    '<p>' + entry.text + '</p>' +
+    '<p style="margin-top:12px; font-size:13.5px; color:var(--ink-soft);">' + NOVENA_CLOSING + '</p>';
+}
+
+document.getElementById('togglePrayers').addEventListener('click', function(){
+  const el = document.getElementById('rosaryPrayers');
+  const showing = el.classList.toggle('show');
+  this.textContent = showing ? 'Hide the Rosary Prayers' : 'Show the Rosary Prayers';
+});
+
 function setGreeting(){
   const hour = new Date().getHours();
   let greeting = "Good evening";
@@ -545,6 +738,8 @@ setGreeting();
 })();
 
 initToday();
+renderRosary();
+renderNovena();
 
 // ---------- PWA: service worker + install prompt ----------
 if('serviceWorker' in navigator){
