@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daily-grace-v5';
+const CACHE_NAME = 'daily-grace-v6';
 const ASSETS = [
   './',
   './index.html',
