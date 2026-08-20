@@ -246,6 +246,52 @@
   }
   .prayer-block p{ font-size:14px; line-height:1.65; margin:0; color:var(--ink); }
 
+  /* ---------- virtual rosary ---------- */
+  .rosary-intro{ margin:0 0 18px; }
+  .rosary-progress{
+    text-align:center; font-size:13px; font-weight:700; letter-spacing:0.03em;
+    color:var(--violet-deep); background:rgba(123,79,224,0.08);
+    border-radius:999px; padding:8px 14px; margin-bottom:14px;
+  }
+  .rosary-widget-wrap{
+    display:flex; justify-content:center; margin:0 auto 18px; max-width:280px;
+  }
+  .rosary-svg{ width:100%; height:auto; overflow:visible; }
+  .bead{ cursor:pointer; transition:r .2s ease, fill .25s ease, opacity .25s ease, filter .25s ease; }
+  .bead.upcoming{ fill:#fff; stroke:#c9bce0; stroke-width:1.2; opacity:0.7; }
+  .bead.done{ fill:var(--violet); opacity:0.5; stroke:none; }
+  .bead.current{ fill:var(--pink); stroke:none; filter:drop-shadow(0 0 5px rgba(240,86,140,0.75)); }
+  .rosary-chain{ fill:none; stroke:#d9cdec; stroke-width:1.4; opacity:0.8; }
+  .rosary-medal{ transition:fill .25s ease, filter .25s ease; }
+  .rosary-medal.upcoming{ fill:#fff; stroke:#c9bce0; stroke-width:1.2; }
+  .rosary-medal.done{ fill:var(--violet); opacity:0.5; }
+  .rosary-medal.current{ fill:var(--pink); filter:drop-shadow(0 0 5px rgba(240,86,140,0.75)); }
+  .rosary-cross{ transition:stroke .25s ease, filter .25s ease; cursor:pointer; }
+  .rosary-cross.upcoming{ stroke:#c9bce0; }
+  .rosary-cross.done{ stroke:var(--violet); opacity:0.6; }
+  .rosary-cross.current{ stroke:var(--pink); filter:drop-shadow(0 0 5px rgba(240,86,140,0.75)); }
+  .rosary-current-card{
+    background:rgba(123,79,224,0.06); border-radius:18px; padding:20px 20px;
+    text-align:center; min-height:96px;
+  }
+  .rosary-step-label{
+    margin:0 0 8px; font-family:'Fraunces', serif; font-style:italic; font-weight:500;
+    font-size:1.05rem; color:var(--violet-deep);
+  }
+  .rosary-step-text{ font-size:14px; line-height:1.65; color:var(--ink); }
+  .rosary-step-text p{ margin:0 0 10px; }
+  .rosary-step-text p:last-child{ margin-bottom:0; }
+  .rosary-mystery-tag{
+    display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:0.04em;
+    padding:4px 12px; border-radius:999px; color:#fff; margin-bottom:10px;
+    background:linear-gradient(100deg, var(--pink), var(--violet));
+  }
+  .rosary-controls{
+    display:flex; justify-content:center; gap:10px; margin-top:18px; flex-wrap:wrap;
+  }
+  .rosary-controls .btn{ min-width:86px; justify-content:center; }
+  .rosary-controls .btn:disabled{ opacity:0.4; cursor:not-allowed; transform:none; }
+
   .novena-day-badge{
     display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700;
     padding:5px 12px; border-radius:999px; color:#fff;
@@ -444,6 +490,33 @@
   </section>
 
   <section class="section">
+    <div class="panel" id="virtual-rosary-panel">
+      <div class="panel-head">
+        <span class="panel-icon" style="background:linear-gradient(135deg, var(--pink), var(--violet));">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="7" r="1.6"/><circle cx="19" cy="7" r="1.6"/><circle cx="5" cy="17" r="1.6"/><circle cx="19" cy="17" r="1.6"/><path d="M6.3 8.2 10 11M18 8.2 14 11M6.3 15.8 10 13M18 15.8 14 13"/><path d="M12 15v6M10.3 19.5 12 21l1.7-1.5"/></svg>
+        </span>
+        <h2>Virtual Rosary</h2>
+      </div>
+      <div class="panel-body">
+        <p class="rosary-intro">No physical rosary on hand? Pray along right here. Tap a bead or use "Next" to move one prayer at a time through the whole Rosary — perfect for today's mysteries or to guide your Novena.</p>
+        <div class="rosary-progress" id="rosaryProgress">Tap "Begin" to start praying</div>
+        <div class="rosary-widget-wrap">
+          <svg id="rosarySvg" viewBox="0 0 300 400" class="rosary-svg" aria-label="Interactive rosary beads"></svg>
+        </div>
+        <div class="rosary-current-card" id="rosaryCurrentCard">
+          <p class="rosary-step-label" id="rosaryStepLabel">Ready when you are</p>
+          <div class="rosary-step-text" id="rosaryStepText"><p>Whenever you're ready, tap "Begin" below and pray one bead at a time. Your place is saved if you need to step away.</p></div>
+        </div>
+        <div class="rosary-controls">
+          <button class="btn btn-ghost" id="rosaryBackBtn" disabled>Back</button>
+          <button class="btn btn-primary" id="rosaryNextBtn">Begin</button>
+          <button class="btn btn-ghost" id="rosaryRestartBtn">Restart</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
     <div class="panel" id="novena-panel">
       <div class="panel-head">
         <span class="panel-icon">
@@ -536,6 +609,314 @@ const NOVENA_DAYS = [
 ];
 
 const NOVENA_CLOSING = "Conclude with an Our Father, a Hail Mary, and a Glory Be.";
+
+// ---------- Virtual Rosary: interactive bead-by-bead prayer guide ----------
+const ROSARY_PRAYER_TEXT = {
+  signOfCross: "In the name of the Father, and of the Son, and of the Holy Spirit. Amen.",
+  creed: "I believe in God, the Father Almighty, Creator of heaven and earth; and in Jesus Christ, His only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried. He descended into hell; on the third day He rose again from the dead. He ascended into heaven, and sits at the right hand of God the Father Almighty. From there He will come to judge the living and the dead. I believe in the Holy Spirit, the Holy Catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen.",
+  ourFather: "Our Father, who art in heaven, hallowed be Thy name. Thy kingdom come, Thy will be done, on earth as it is in heaven. Give us this day our daily bread, and forgive us our trespasses, as we forgive those who trespass against us. And lead us not into temptation, but deliver us from evil. Amen.",
+  hailMary: "Hail Mary, full of grace, the Lord is with thee. Blessed art thou among women, and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.",
+  gloryBe: "Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end. Amen.",
+  fatima: "O my Jesus, forgive us our sins, save us from the fires of hell, lead all souls to Heaven, especially those in most need of Thy mercy.",
+  hailHolyQueen: "Hail, Holy Queen, Mother of mercy, our life, our sweetness, and our hope. To thee do we cry, poor banished children of Eve. To thee do we send up our sighs, mourning and weeping in this valley of tears. Turn then, most gracious advocate, thine eyes of mercy toward us, and after this our exile, show unto us the blessed fruit of thy womb, Jesus. O clement, O loving, O sweet Virgin Mary. Amen."
+};
+
+const HAIL_MARY_INTENTIONS = ["for Faith", "for Hope", "for Charity"];
+
+function buildRosarySteps(){
+  const weekday = new Date().getDay();
+  const mysteryName = MYSTERY_BY_WEEKDAY[weekday];
+  const set = MYSTERIES[mysteryName];
+  const steps = [];
+
+  steps.push({ bead:'cross', label:'Sign of the Cross', text:[ROSARY_PRAYER_TEXT.signOfCross] });
+  steps.push({ bead:'cross', label:"Apostles' Creed", text:[ROSARY_PRAYER_TEXT.creed] });
+  steps.push({ bead:'tail0', label:'Our Father', text:[ROSARY_PRAYER_TEXT.ourFather] });
+  for(let i=0;i<3;i++){
+    steps.push({ bead:'tail'+(i+1), label:'Hail Mary ' + (i+1) + ' of 3 (' + HAIL_MARY_INTENTIONS[i] + ')', text:[ROSARY_PRAYER_TEXT.hailMary] });
+  }
+  steps.push({ bead:'medal', label:'Glory Be', text:[ROSARY_PRAYER_TEXT.gloryBe] });
+
+  for(let d=0; d<5; d++){
+    const mystery = set[d];
+    const loopBase = d*11;
+    steps.push({
+      bead:'loop'+loopBase, decade:d+1, mysteryName:mysteryName,
+      label:'Decade ' + (d+1) + ' of 5 — The ' + mystery.name,
+      text:[mystery.meditation], isAnnounce:true
+    });
+    steps.push({ bead:'loop'+loopBase, decade:d+1, mysteryName:mysteryName, label:'Our Father', text:[ROSARY_PRAYER_TEXT.ourFather] });
+    for(let h=1; h<=10; h++){
+      steps.push({ bead:'loop'+(loopBase+h), decade:d+1, mysteryName:mysteryName, label:'Hail Mary ' + h + ' of 10', text:[ROSARY_PRAYER_TEXT.hailMary] });
+    }
+    steps.push({ bead:'loop'+(loopBase+10), decade:d+1, mysteryName:mysteryName, label:'Glory Be', text:[ROSARY_PRAYER_TEXT.gloryBe, ROSARY_PRAYER_TEXT.fatima] });
+  }
+
+  steps.push({ bead:'medal', label:'Hail, Holy Queen', text:[ROSARY_PRAYER_TEXT.hailHolyQueen] });
+  steps.push({ bead:'cross', label:'Sign of the Cross (Closing)', text:[ROSARY_PRAYER_TEXT.signOfCross] });
+  steps.push({ bead:'done', label:'Amen 🙏', text:['The Rosary is complete. Well prayed, Joe & Aira.'] });
+
+  return { steps, mysteryName };
+}
+
+const RosaryWidget = (function(){
+  const STORAGE_KEY = 'dailyGraceRosaryProgress';
+  let steps = [];
+  let mysteryName = '';
+  let current = -1; // -1 = not started
+
+  const beadEls = {}; // beadId -> [elements]
+
+  function todayKey(){
+    return new Date().toDateString();
+  }
+
+  function loadProgress(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return null;
+      const data = JSON.parse(raw);
+      if(data && data.date === todayKey() && typeof data.index === 'number') return data.index;
+    }catch(e){}
+    return null;
+  }
+
+  function saveProgress(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: todayKey(), index: current }));
+    }catch(e){}
+  }
+
+  function clearProgress(){
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  }
+
+  function polarPoint(cx, cy, rx, ry, angleDeg){
+    const a = angleDeg * Math.PI / 180;
+    return { x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a) };
+  }
+
+  function buildLayout(){
+    const cx = 150, cy = 175, rx = 112, ry = 108;
+    const gapDeg = 30;
+    const startAngle = -90 + gapDeg/2;
+    const sweep = 360 - gapDeg;
+    const totalLoopBeads = 55; // 5 OF + 50 HM
+    const angleStep = sweep / (totalLoopBeads - 1);
+
+    const points = {};
+    for(let i=0;i<totalLoopBeads;i++){
+      const angle = startAngle + i * angleStep;
+      points['loop'+i] = { ...polarPoint(cx, cy, rx, ry, angle), big: i % 11 === 0 };
+    }
+    // tail hangs below the medal
+    points.medal = { x: cx, y: cy - ry - 6, big:false, medal:true };
+    points.tail0 = { x: cx, y: cy - ry - 34, big:true };
+    points.tail1 = { x: cx, y: cy - ry - 58, big:false };
+    points.tail2 = { x: cx, y: cy - ry - 80, big:false };
+    points.tail3 = { x: cx, y: cy - ry - 102, big:false };
+    points.cross = { x: cx, y: cy - ry - 132, big:false, cross:true };
+    return points;
+  }
+
+  function svgns(tag){ return document.createElementNS('http://www.w3.org/2000/svg', tag); }
+
+  function renderSvg(){
+    const svg = document.getElementById('rosarySvg');
+    svg.innerHTML = '';
+    const layout = buildLayout();
+
+    // chain path: tail then loop
+    const chainPts = ['cross','tail3','tail2','tail1','tail0','medal'];
+    for(let i=0;i<55;i++) chainPts.push('loop'+i);
+    let d = '';
+    chainPts.forEach((id, idx) => {
+      const p = layout[id];
+      d += (idx === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1) + ' ';
+    });
+    // close the loop back near the medal
+    d += 'L' + layout.medal.x.toFixed(1) + ',' + layout.medal.y.toFixed(1);
+    const path = svgns('path');
+    path.setAttribute('d', d);
+    path.setAttribute('class', 'rosary-chain');
+    svg.appendChild(path);
+
+    // crucifix
+    const crossGroup = svgns('g');
+    crossGroup.setAttribute('class', 'rosary-cross upcoming');
+    crossGroup.dataset.bead = 'cross';
+    const cx = layout.cross.x, cy = layout.cross.y;
+    const vBar = svgns('line');
+    vBar.setAttribute('x1', cx); vBar.setAttribute('y1', cy-14);
+    vBar.setAttribute('x2', cx); vBar.setAttribute('y2', cy+14);
+    vBar.setAttribute('stroke', 'currentColor'); vBar.setAttribute('stroke-width', '5'); vBar.setAttribute('stroke-linecap','round');
+    const hBar = svgns('line');
+    hBar.setAttribute('x1', cx-10); hBar.setAttribute('y1', cy-4);
+    hBar.setAttribute('x2', cx+10); hBar.setAttribute('y2', cy-4);
+    hBar.setAttribute('stroke', 'currentColor'); hBar.setAttribute('stroke-width', '5'); hBar.setAttribute('stroke-linecap','round');
+    crossGroup.appendChild(vBar); crossGroup.appendChild(hBar);
+    crossGroup.addEventListener('click', () => jumpToBead('cross'));
+    svg.appendChild(crossGroup);
+    beadEls.cross = [crossGroup];
+
+    // medal
+    const medal = svgns('circle');
+    medal.setAttribute('cx', layout.medal.x); medal.setAttribute('cy', layout.medal.y);
+    medal.setAttribute('r', 7);
+    medal.setAttribute('class', 'rosary-medal upcoming');
+    medal.addEventListener('click', () => jumpToBead('medal'));
+    svg.appendChild(medal);
+    beadEls.medal = [medal];
+
+    // tail beads
+    ['tail0','tail1','tail2','tail3'].forEach(id => {
+      const p = layout[id];
+      const c = svgns('circle');
+      c.setAttribute('cx', p.x); c.setAttribute('cy', p.y);
+      c.setAttribute('r', p.big ? 7 : 5);
+      c.setAttribute('class', 'bead upcoming');
+      c.addEventListener('click', () => jumpToBead(id));
+      svg.appendChild(c);
+      beadEls[id] = [c];
+    });
+
+    // loop beads
+    for(let i=0;i<55;i++){
+      const id = 'loop'+i;
+      const p = layout[id];
+      const c = svgns('circle');
+      c.setAttribute('cx', p.x); c.setAttribute('cy', p.y);
+      c.setAttribute('r', p.big ? 7 : 4.5);
+      c.setAttribute('class', 'bead upcoming');
+      c.addEventListener('click', () => jumpToBead(id));
+      svg.appendChild(c);
+      beadEls[id] = [c];
+    }
+  }
+
+  function applyBeadStates(){
+    // reset all
+    Object.keys(beadEls).forEach(id => {
+      beadEls[id].forEach(el => {
+        el.classList.remove('done','current','upcoming');
+        el.classList.add('upcoming');
+      });
+    });
+    if(current < 0) return;
+    const doneBeads = new Set();
+    for(let i=0;i<current;i++) doneBeads.add(steps[i].bead);
+    doneBeads.forEach(id => {
+      if(beadEls[id]) beadEls[id].forEach(el => { el.classList.remove('upcoming'); el.classList.add('done'); });
+    });
+    const curBead = steps[current] && steps[current].bead;
+    if(curBead && beadEls[curBead]){
+      beadEls[curBead].forEach(el => { el.classList.remove('upcoming','done'); el.classList.add('current'); });
+    }
+  }
+
+  function progressLabel(){
+    if(current < 0) return 'Tap "Begin" to start praying';
+    const step = steps[current];
+    if(!step) return '';
+    if(step.bead === 'done') return 'Rosary complete 🙏';
+    if(step.decade) return 'Decade ' + step.decade + ' of 5 — The ' + mysteryName + ' Mysteries';
+    if(current < 7) return 'Opening Prayers';
+    return 'Closing Prayers';
+  }
+
+  function render(){
+    applyBeadStates();
+    document.getElementById('rosaryProgress').textContent = progressLabel();
+    const labelEl = document.getElementById('rosaryStepLabel');
+    const textEl = document.getElementById('rosaryStepText');
+    const nextBtn = document.getElementById('rosaryNextBtn');
+    const backBtn = document.getElementById('rosaryBackBtn');
+
+    if(current < 0){
+      labelEl.textContent = 'Ready when you are';
+      textEl.innerHTML = '<p>Whenever you\'re ready, tap "Begin" below and pray one bead at a time. Your place is saved if you need to step away.</p>';
+      nextBtn.textContent = 'Begin';
+      backBtn.disabled = true;
+      return;
+    }
+
+    const step = steps[current];
+    let html = '';
+    if(step.isAnnounce){
+      html += '<span class="rosary-mystery-tag">The ' + mysteryName + ' Mysteries</span>';
+    }
+    html += step.text.map(t => '<p>' + t + '</p>').join('');
+    labelEl.textContent = step.label;
+    textEl.innerHTML = html;
+    backBtn.disabled = current === 0;
+
+    if(step.bead === 'done'){
+      nextBtn.textContent = 'Restart';
+    } else {
+      nextBtn.textContent = 'Next';
+    }
+  }
+
+  function scrollIntoView(){
+    const card = document.getElementById('rosaryCurrentCard');
+    if(card) card.scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+
+  function next(){
+    if(current >= 0 && steps[current] && steps[current].bead === 'done'){
+      restart();
+      return;
+    }
+    if(current < steps.length - 1) current++;
+    saveProgress();
+    render();
+  }
+
+  function back(){
+    if(current > 0) current--;
+    saveProgress();
+    render();
+  }
+
+  function restart(){
+    current = -1;
+    clearProgress();
+    render();
+  }
+
+  function jumpToBead(beadId){
+    // find nearest step with this bead at or after current, else first occurrence
+    let idx = -1;
+    for(let i = Math.max(current,0); i < steps.length; i++){
+      if(steps[i].bead === beadId){ idx = i; break; }
+    }
+    if(idx === -1){
+      idx = steps.findIndex(s => s.bead === beadId);
+    }
+    if(idx === -1) return;
+    current = idx;
+    saveProgress();
+    render();
+  }
+
+  function init(){
+    const built = buildRosarySteps();
+    steps = built.steps;
+    mysteryName = built.mysteryName;
+    renderSvg();
+
+    const saved = loadProgress();
+    if(saved !== null && saved < steps.length) current = saved;
+
+    document.getElementById('rosaryNextBtn').addEventListener('click', () => { next(); scrollIntoView(); });
+    document.getElementById('rosaryBackBtn').addEventListener('click', () => { back(); });
+    document.getElementById('rosaryRestartBtn').addEventListener('click', () => { restart(); });
+
+    render();
+  }
+
+  return { init };
+})();
 
 const VERSES = [
   {
@@ -740,6 +1121,7 @@ setGreeting();
 initToday();
 renderRosary();
 renderNovena();
+RosaryWidget.init();
 
 // ---------- PWA: service worker + install prompt ----------
 if('serviceWorker' in navigator){
